@@ -4,12 +4,11 @@ pub enum Token {
     OpenParen,
     CloseParen,
 
-    // String
-    String(String),
-
     // Number types
     Integer(i64),
-    Decimal(f64),
+
+    // Binary types
+    Boolean(bool),
 
     // Built-ins
     If,
@@ -33,21 +32,6 @@ pub fn lex(input: &str) -> Vec<Token> {
             ')' => {
                 chars.next();
                 tokens.push(Token::CloseParen)
-            }
-
-            // Lexing strings
-            '"' => {
-                let mut word = String::new();
-
-                while let Some(c) = chars.next() {
-                    if c == '"' {
-                        break;
-                    }
-
-                    word.push(c);
-                }
-
-                tokens.push(Token::String(word));
             }
 
             // Lex everything else
@@ -75,12 +59,12 @@ pub fn lex(input: &str) -> Vec<Token> {
                 let parsed_token: Token = match word.as_str() {
                     "if" => Token::If,
                     "+" | "-" | "*" | "/" => Token::BinaryOp(word),
+                    "true" => Token::Boolean(true),
+                    "false" => Token::Boolean(false),
                     "print" | "len" | "concat" => Token::Keyword(word),
                     _ => {
                         if let Ok(int) = word.parse::<i64>() {
                             Token::Integer(int)
-                        } else if let Ok(float) = word.parse::<f64>() {
-                            Token::Decimal(float)
                         } else {
                             Token::Symbol(word)
                         }

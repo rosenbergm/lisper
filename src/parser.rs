@@ -4,12 +4,11 @@ use crate::lexer::Token;
 
 #[derive(Debug)]
 pub enum Expr {
-    String(String),
     Integer(i64),
-    Decimal(f64),
+    Boolean(bool),
 
     If,
-    BinaryOp(String),
+    Op(String),
     Keyword(String),
     Symbol(String),
 
@@ -33,16 +32,12 @@ where
 
     while let Some(token) = tokens.peek() {
         match token {
-            Token::String(string) => {
-                exprs.push(Expr::String(string.clone()));
-                tokens.next();
-            }
             Token::Integer(integer) => {
                 exprs.push(Expr::Integer(*integer));
                 tokens.next();
             }
-            Token::Decimal(decimal) => {
-                exprs.push(Expr::Decimal(*decimal));
+            Token::Boolean(boolean) => {
+                exprs.push(Expr::Boolean(*boolean));
                 tokens.next();
             }
             Token::If => {
@@ -50,7 +45,7 @@ where
                 tokens.next();
             }
             Token::BinaryOp(operator) => {
-                exprs.push(Expr::BinaryOp(operator.clone()));
+                exprs.push(Expr::Op(operator.clone()));
                 tokens.next();
             }
             Token::Keyword(keyword) => {

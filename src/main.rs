@@ -1,10 +1,11 @@
-use crate::{lexer::lex, parser::parse};
+use crate::{eval::evaluate, lexer::lex, parser::parse};
 
+mod eval;
 mod lexer;
 mod parser;
 
 fn main() {
-    let line = "(concat (1 2 3) (4 5 6 44 ahoj))";
+    let line = "(+ (- 5 2) 3)";
 
     let tokens = lex(&line);
 
@@ -13,4 +14,8 @@ fn main() {
     let parsed = parse(&mut tokens.into_iter().peekable());
 
     println!("{:?}", parsed);
+
+    let evaluated = evaluate(&parsed);
+
+    println!("{:?}", evaluated);
 }
