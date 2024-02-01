@@ -1,31 +1,32 @@
+//! Parser
+
 use std::iter::Peekable;
 
-use crate::lexer::Token;
+use crate::{expr::Expr, lexer::Token};
 
-#[derive(Debug)]
-pub enum Expr {
-    Integer(i64),
-    Boolean(bool),
-
-    If,
-    Op(String),
-    Keyword(String),
-    Symbol(String),
-
-    List(Vec<Expr>),
-
-    NoOp,
+pub enum ParseError {
+    ParenExpected,
 }
 
-pub fn parse<I>(tokens: &mut Peekable<I>) -> Expr
+impl std::fmt::Display for ParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ParseError::ParenExpected => write!(f, "Opening parenthesis expected"),
+        }
+    }
+}
+
+pub fn parse<I>(tokens: &mut Peekable<I>) -> Result<Expr, ParseError>
 where
     I: Iterator<Item = Token>,
 {
+    // Check if first token is a paranthesis
     if let Some(Token::OpenParen) = tokens.peek() {
         // Continue, everything is fine.
         tokens.next();
     } else {
-        panic!("Expected open paren");
+        // Throw error
+        return Err(ParseError::ParenExpected);
     }
 
     let mut exprs: Vec<Expr> = Vec::new();
@@ -57,14 +58,14 @@ where
                 tokens.next();
             }
             Token::OpenParen => {
-                exprs.push(parse(tokens));
+                exprs.push(parse(tokens)?);
             }
             Token::CloseParen => {
                 tokens.next();
-                return Expr::List(exprs);
+                return Ok(Expr::List(exprs));
             }
         }
     }
 
-    return Expr::List(exprs);
+    Ok(Expr::List(exprs))
 }

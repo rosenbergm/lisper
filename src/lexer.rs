@@ -1,3 +1,5 @@
+//! Lexer
+
 #[derive(Debug, Clone)]
 pub enum Token {
     // S-expression delimiters
@@ -58,10 +60,11 @@ pub fn lex(input: &str) -> Vec<Token> {
 
                 let parsed_token: Token = match word.as_str() {
                     "if" => Token::If,
-                    "+" | "-" | "*" | "/" => Token::BinaryOp(word),
+                    "+" | "-" | "*" | "/" | "=" | "!=" | "<" | "<=" | ">" | ">=" | "and" | "or"
+                    | "not" => Token::BinaryOp(word),
                     "true" => Token::Boolean(true),
                     "false" => Token::Boolean(false),
-                    "print" | "len" | "concat" => Token::Keyword(word),
+                    "print" | "def" | "defun" | "lambda" => Token::Keyword(word),
                     _ => {
                         if let Ok(int) = word.parse::<i64>() {
                             Token::Integer(int)
